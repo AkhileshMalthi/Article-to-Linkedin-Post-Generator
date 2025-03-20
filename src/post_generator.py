@@ -1,7 +1,6 @@
 import os
 from langchain_groq import ChatGroq
 from langchain.prompts import ChatPromptTemplate
-from langchain.chains import LLMChain
 
 def generate_linkedin_post(article, user_config):
     """
@@ -16,13 +15,9 @@ def generate_linkedin_post(article, user_config):
     """
     try:
         # Initialize Groq LLM
-        groq_api_key = os.getenv("GROQ_API_KEY")
-        if not groq_api_key:
-            raise ValueError("GROQ_API_KEY environment variable is not set")
-        
         llm = ChatGroq(
-            api_key=groq_api_key, 
-            model="llama3-70b-8192"
+            api_key=os.getenv("GROQ_API_KEY", "GROQ_API_KEY is missing in the environment variables"), # type: ignore
+            model=os.getenv("GROQ_MODEL", "GROQ_MODEL is missing in the environment variables")
         )
         
         # Create prompt template
@@ -59,19 +54,34 @@ def generate_linkedin_post(article, user_config):
             ("user", user_template)
         ])
         
-        # Create LLM chain
-        chain = LLMChain(llm=llm, prompt=prompt)
+        # Create the chain using the modern approach
+        chain = prompt | llm
         
         # Generate the post
-        response = chain.run(
-            title=article['title'],
-            source=article['source']['name'],
-            description=article['description'] or "No description available",
-            style_preferences=user_config.post_style or "Professional, engaging LinkedIn style",
-            few_shot_examples=few_shot
-        )
-        
-        return response.strip()
+        response = chain.invoke({
+            "title": article['title'],
+            "source": article['source']['name'],
+            "description": article['description'] or "No description available",
+            "style_preferences": user_config.post_style or "Professional, engaging LinkedIn style",
+            "few_shot_examples": few_shot
+        })
+
+        # If response is a list, extract the first string or dict with 'content'
+        if isinstance(response, list):
+            if response and isinstance(response[0], dict) and 'content' in response[0]:
+                return response[0]['content'].strip()
+            elif response and isinstance(response[0], str):
+                return response[0].strip()
+            else:
+                return str(response).strip()
+        # If response is a dict with 'content'
+        elif isinstance(response, dict) and 'content' in response:
+            return response['content'].strip()
+        # If response is a string
+        elif isinstance(response, str):
+            return response.strip()
+        else:
+            return str(response).strip()
         
     except Exception as e:
         print(f"Error generating post: {e}")
