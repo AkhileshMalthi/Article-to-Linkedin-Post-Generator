@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "article-to-linkedin-post-generator"
+version = "0.1.0"
+description = "Generate personalized LinkedIn posts from trending articles"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+streamlit = "^1.32.0"
+langchain = "^0.1.6"
+langchain-groq = "^0.1.5"
+newsapi-python = "^0.2.7"
+python-dotenv = "^1.0.0"
+requests = "^2.31.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.4.0"
+black = "^23.7.0"
+isort = "^5.12.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
