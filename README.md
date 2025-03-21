@@ -17,15 +17,31 @@ This application helps users create engaging LinkedIn posts based on trending ar
 - Dependency Management: Poetry
 
 ## Setup Instructions
+
+### Local Development
 1. Clone this repository
-2. Install dependencies: `poetry install`
-3. Set up your GroqAPI key in `.env` file
-4. Run the application: `poetry run streamlit run app.py`
+2. Install dependencies: `poetry install` or `pip install -r requirements.txt`
+3. Copy `.env.example` to `.env` and add your API keys:
+   ```bash
+   GROQ_API_KEY=your_groq_api_key_here
+   NEWS_API_KEY=your_news_api_key_here
+   ```
+4. Run the application: `poetry run streamlit run app.py` or `streamlit run app.py`
+
+### � Railway Deployment
+This application is optimized for deployment on Railway. See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
+
+#### Quick Deploy to Railway
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template)
+
+**Required Environment Variables:**
+- `GROQ_API_KEY` - Your Groq API key
+- `NEWS_API_KEY` - Your News API key
 
 ## Usage
-1. Select a topic of interest
-2. Browse trending articles
-3. Click on an article to view details
-4. Generate a LinkedIn post from the selected article
-5. Customize your post as needed
-6. Copy the post to your clipboard and share on LinkedIn
+1. Select a topic of interest from the dropdown
+2. Browse trending articles in the selected category
+3. Click on an article to view details and summary
+4. Generate a personalized LinkedIn post from the selected article
+5. Customize your post style and preferences in the sidebar
+6. Copy the generated post to your clipboard and share on LinkedIn
