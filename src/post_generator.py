@@ -1,6 +1,7 @@
 import os
 from langchain_groq import ChatGroq
 from langchain.prompts import ChatPromptTemplate
+from src.prompts import SYSTEM_TEMPLATE, USER_TEMPLATE, get_few_shot_examples
 
 def generate_linkedin_post(article, user_config):
     """
@@ -20,38 +21,14 @@ def generate_linkedin_post(article, user_config):
             model=os.getenv("GROQ_MODEL", "GROQ_MODEL is missing in the environment variables")
         )
         
-        # Create prompt template
-        system_template = """
-        You are a professional LinkedIn post generator. 
-        Your task is to create engaging LinkedIn posts based on articles.
-        The post should be informative, engaging, and match the user's style preferences.
-        """
-        
-        user_template = """
-        Generate a LinkedIn post based on this article:
-        
-        Title: {title}
-        Source: {source}
-        Description: {description}
-        
-        User Style Preferences:
-        {style_preferences}
-        
-        {few_shot_examples}
-        
-        Create an engaging LinkedIn post that summarizes key insights from the article,
-        adds thoughtful commentary, and encourages engagement. Include relevant hashtags.
-        """
-        
+        # Create prompt template using imported templates
         # Add few-shot examples if available
-        few_shot = ""
-        if user_config.sample_posts:
-            few_shot = "Here are sample posts from the user for reference:\n\n" + user_config.sample_posts
+        few_shot = get_few_shot_examples(user_config)
         
         # Create the prompt
         prompt = ChatPromptTemplate.from_messages([
-            ("system", system_template),
-            ("user", user_template)
+            ("system", SYSTEM_TEMPLATE),
+            ("user", USER_TEMPLATE)
         ])
         
         # Create the chain using the modern approach
@@ -66,20 +43,13 @@ def generate_linkedin_post(article, user_config):
             "few_shot_examples": few_shot
         })
 
-        # If response is a list, extract the first string or dict with 'content'
-        if isinstance(response, list):
-            if response and isinstance(response[0], dict) and 'content' in response[0]:
-                return response[0]['content'].strip()
-            elif response and isinstance(response[0], str):
-                return response[0].strip()
-            else:
-                return str(response).strip()
-        # If response is a dict with 'content'
-        elif isinstance(response, dict) and 'content' in response:
-            return response['content'].strip()
-        # If response is a string
+        # Extract content from LangChain response object
+        if hasattr(response, 'content') and isinstance(response.content, str):
+            return response.content.strip()
         elif isinstance(response, str):
             return response.strip()
+        elif isinstance(response, dict) and 'content' in response:
+            return response['content'].strip()
         else:
             return str(response).strip()
         
