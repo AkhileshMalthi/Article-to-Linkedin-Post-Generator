@@ -28,11 +28,6 @@ This application helps users create engaging LinkedIn posts based on trending ar
    ```
 4. Run the application: `poetry run streamlit run app.py` or `streamlit run app.py`
 
-### � Railway Deployment
-This application is optimized for deployment on Railway. See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
-
-#### Quick Deploy to Railway
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template)
 
 **Required Environment Variables:**
 - `GROQ_API_KEY` - Your Groq API key
